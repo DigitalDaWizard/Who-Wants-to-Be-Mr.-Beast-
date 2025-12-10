@@ -50,10 +50,11 @@ export const generateQuestions = async (difficulty: DifficultyLevel): Promise<Qu
       const fullPrompt = `${TRIVIA_PROMPT_BASE} ${promptDetail} Return only a raw JSON array of objects.`;
 
       try {
-          // Standard Deployment via Google GenAI SDK (Preferred for Sharing)
-          // If API_KEY is available (configured in Vercel/Netlify/Local env)
-          if (process.env.API_KEY) {
-            const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+          // Standard Deployment via Google GenAI SDK
+          const apiKey = process.env.API_KEY;
+
+          if (apiKey) {
+            const ai = new GoogleGenAI({ apiKey: apiKey });
             const response = await ai.models.generateContent({
                 model: 'gemini-2.5-flash',
                 contents: fullPrompt,
@@ -74,13 +75,12 @@ export const generateQuestions = async (difficulty: DifficultyLevel): Promise<Qu
                 aiQuestions = JSON.parse(cleanJson) as Question[];
             }
           } else {
-             // Fallback to mocks if no API key and no Puter
              console.warn("No API Key or Puter found. Using mocks.");
-             throw new Error("No AI Service Available");
+             // Don't throw here, just fall through to merge logic which will fill with mocks
           }
       } catch (error) {
           console.error("Error fetching questions:", error);
-          aiQuestions = mockQuestions;
+          // Fall through to mocks
       }
   }
 
