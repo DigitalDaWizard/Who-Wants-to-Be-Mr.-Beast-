@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Who Wants to Be Mr. Beast?</title>
+    <script src="https://js.puter.com/v2/"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              beast: {
+                blue: '#0EA5E9',
+                pink: '#EC4899',
+                yellow: '#FACC15',
+                gold: '#FFD700',   // Primary
+                red: '#FF6B6B',    // Secondary
+                navy: '#0A0E27',   // Background
+                teal: '#4ECDC4',   // Success
+                danger: '#FF4757', // Danger
+                dark: '#0F172A',
+              }
+            },
+            animation: {
+              'pulse-fast': 'pulse 1s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+              'bounce-short': 'bounce 0.5s infinite',
+              'snip': 'snip 0.5s ease-in-out forwards',
+              'slash': 'slash 0.5s ease-out forwards',
+              'shake': 'shake 0.5s cubic-bezier(.36,.07,.19,.97) both',
+              'flash': 'flash 0.5s ease-out forwards',
+              'slide-up': 'slide-up 0.3s ease-out forwards',
+              'fade-in': 'fade-in 0.3s ease-out forwards',
+              'scale-in': 'scale-in 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards',
+              'spin-slow': 'spin 3s linear infinite',
+              'gradient-x': 'gradient-x 3s ease infinite',
+            }
+          }
+        }
+      }
+    </script>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&display=swap');
+      body {
+        font-family: 'Montserrat', sans-serif;
+        background-color: #0A0E27;
+        color: white;
+        overflow-x: hidden;
+      }
+      .text-shadow {
+        text-shadow: 2px 2px 0px #000000;
+      }
+      .text-shadow-lg {
+        text-shadow: 4px 4px 0px #000000;
+      }
+      .custom-scrollbar::-webkit-scrollbar {
+        width: 4px;
+      }
+      .custom-scrollbar::-webkit-scrollbar-track {
+        background: rgba(255, 255, 255, 0.1);
+      }
+      .custom-scrollbar::-webkit-scrollbar-thumb {
+        background: #FFD700;
+        border-radius: 4px;
+      }
+
+      /* Custom Keyframes */
+      @keyframes snip {
+        0% { transform: scale(1) rotate(0deg); }
+        50% { transform: scale(1.2) rotate(-20deg); }
+        100% { transform: scale(1) rotate(0deg); }
+      }
+      @keyframes slash {
+        0% { width: 0; opacity: 1; }
+        50% { width: 100%; opacity: 1; }
+        100% { width: 100%; opacity: 0; }
+      }
+      @keyframes slide-up {
+        from { transform: translateY(100%); opacity: 0; }
+        to { transform: translateY(0); opacity: 1; }
+      }
+      @keyframes fade-in {
+        from { opacity: 0; transform: scale(0.95); }
+        to { opacity: 1; transform: scale(1); }
+      }
+      @keyframes scale-in {
+        from { opacity: 0; transform: scale(0); }
+        to { opacity: 1; transform: scale(1); }
+      }
+      @keyframes shake {
+        10%, 90% { transform: translate3d(-1px, 0, 0); }
+        20%, 80% { transform: translate3d(2px, 0, 0); }
+        30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+        40%, 60% { transform: translate3d(4px, 0, 0); }
+      }
+      @keyframes flash {
+        0% { opacity: 0.8; }
+        100% { opacity: 0; }
+      }
+      @keyframes loading {
+        0% { background-position: 200% 0; }
+        100% { background-position: -200% 0; }
+      }
+      @keyframes gradient-x {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+      }
+    </style>
+  <script type="importmap">
+{
+  "imports": {
+    "@google/genai": "https://aistudiocdn.com/@google/genai@^1.32.0",
+    "react-dom/client": "https://aistudiocdn.com/react-dom@^19.2.1/client",
+    "lucide-react": "https://aistudiocdn.com/lucide-react@^0.556.0",
+    "react": "https://aistudiocdn.com/react@^19.2.1",
+    "canvas-confetti": "https://aistudiocdn.com/canvas-confetti@^1.9.4",
+    "react/": "https://aistudiocdn.com/react@^19.2.1/",
+    "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.1/",
+    "next/": "https://aistudiocdn.com/next@^16.0.8/",
+    "@supabase/supabase-js": "https://aistudiocdn.com/@supabase/supabase-js@^2.87.0",
+    "bcryptjs": "https://aistudiocdn.com/bcryptjs@^3.0.3",
+    "jose": "https://aistudiocdn.com/jose@^6.1.3"
+  }
+}
+</script>
+</head>
+  <body>
+    <div id="root"></div>
+  </body>
+</html>
