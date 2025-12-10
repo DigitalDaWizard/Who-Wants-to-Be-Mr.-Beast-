@@ -1,8 +1,9 @@
+import { GoogleGenAI } from "@google/genai";
 import { Question, DifficultyLevel } from "../types";
 import { TRIVIA_PROMPT_BASE, DIFFICULTY_CONFIGS } from "../constants";
 import { getCustomQuestions } from "./customQuestionService";
 
-// Define Puter globally for TypeScript (since it's loaded via script tag)
+// Helper for Puter (legacy)
 declare global {
   interface Window {
     puter: any;
@@ -15,8 +16,6 @@ export const generateQuestions = async (difficulty: DifficultyLevel): Promise<Qu
 
   // 1. Fetch Custom Questions from Local Storage
   const allCustomQuestions = getCustomQuestions();
-  
-  // Filter custom questions to match difficulty
   let matchingCustomQs: Question[] = [];
   
   if (difficulty === 'EASY') {
@@ -26,17 +25,14 @@ export const generateQuestions = async (difficulty: DifficultyLevel): Promise<Qu
   } else if (difficulty === 'HARD') {
      matchingCustomQs = allCustomQuestions.filter(q => q.difficulty === 'hard' || q.difficulty === 'medium');
   } else {
-     // Impossible: take everything, preferably hard
      matchingCustomQs = allCustomQuestions.filter(q => q.difficulty === 'hard');
   }
   
-  // Shuffle custom questions
   matchingCustomQs = matchingCustomQs.sort(() => 0.5 - Math.random());
   
   // 2. Fetch AI Questions
   let aiQuestions: Question[] = [];
   
-  // Only call API if we still need questions
   if (matchingCustomQs.length < count) {
       const needed = count - matchingCustomQs.length;
       let promptDetail = "";
@@ -48,38 +44,50 @@ export const generateQuestions = async (difficulty: DifficultyLevel): Promise<Qu
       } else if (difficulty === 'HARD') {
           promptDetail = `Generate ${needed} questions. Questions 1-5 Easy/Medium, 6-10 Hard, 11-15 Very Hard. Topics: Obscure facts, Specific dates, Complex logic.`;
       } else {
-          // Impossible
           promptDetail = `Generate ${needed} questions. Start Medium, quickly ramping to Extremely Hard and Obscure. Topics: Deep Science, Ancient History, Niche Internet Culture.`;
       }
 
-      try {
-          if (!window.puter) {
-            console.warn("Puter.js not loaded. Returning mock data.");
-            throw new Error("Puter not found");
-          }
+      const fullPrompt = `${TRIVIA_PROMPT_BASE} ${promptDetail} Return only a raw JSON array of objects.`;
 
-          const fullPrompt = `${TRIVIA_PROMPT_BASE} ${promptDetail} Return only a raw JSON array of objects.`;
-          
-          const response = await window.puter.ai.chat(fullPrompt);
-          
-          if (response) {
-             // Cleanup Markdown code blocks if Puter adds them
-             const cleanJson = response.replace(/```json/g, '').replace(/```/g, '').trim();
-             aiQuestions = JSON.parse(cleanJson) as Question[];
+      try {
+          // Standard Deployment via Google GenAI SDK (Preferred for Sharing)
+          // If API_KEY is available (configured in Vercel/Netlify/Local env)
+          if (process.env.API_KEY) {
+            const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+            const response = await ai.models.generateContent({
+                model: 'gemini-2.5-flash',
+                contents: fullPrompt,
+                config: {
+                    responseMimeType: 'application/json'
+                }
+            });
+            const text = response.text;
+            if (text) {
+                aiQuestions = JSON.parse(text) as Question[];
+            }
+          } 
+          // Legacy Puter Support (if hosted on Puter.com)
+          else if (window.puter) {
+            const response = await window.puter.ai.chat(fullPrompt);
+            if (response) {
+                const cleanJson = response.replace(/```json/g, '').replace(/```/g, '').trim();
+                aiQuestions = JSON.parse(cleanJson) as Question[];
+            }
+          } else {
+             // Fallback to mocks if no API key and no Puter
+             console.warn("No API Key or Puter found. Using mocks.");
+             throw new Error("No AI Service Available");
           }
       } catch (error) {
-          console.error("Error fetching questions via Puter:", error);
+          console.error("Error fetching questions:", error);
           aiQuestions = mockQuestions;
       }
   }
 
   // 3. Merge
-  // Strategy: Prepend custom questions to ensure they are seen, fill rest with AI/Mock
   const merged = [...matchingCustomQs, ...aiQuestions];
   
-  // Ensure we return exactly 'count' questions (or fewer if we don't have enough, but duplicate mock if needed)
   if (merged.length < count) {
-      // Not enough questions, pad with mocks
       const needed = count - merged.length;
       return [...merged, ...mockQuestions.slice(0, needed)];
   }
