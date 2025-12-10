@@ -87,10 +87,6 @@ const GameScreen: React.FC<Props> = ({
     // Start/Resume Timer
     timerRef.current = window.setInterval(() => {
         setTimeLeft(prev => {
-            if (prev <= 10 && prev > 0) {
-              audioService.play('tick');
-            }
-
             if (prev <= 1) {
                 if (timerRef.current) clearInterval(timerRef.current);
                 onTimeOut();
@@ -104,6 +100,13 @@ const GameScreen: React.FC<Props> = ({
         if (timerRef.current) clearInterval(timerRef.current);
     };
   }, [question, onTimeOut, modalState, answerStatus]); 
+
+  // Audio Tick Effect - Plays when time changes and is low
+  useEffect(() => {
+     if (timeLeft <= 10 && timeLeft > 0 && !modalState && answerStatus === 'idle') {
+        audioService.play('tick');
+     }
+  }, [timeLeft, modalState, answerStatus]);
 
   // Handle Option Click
   const handleOptionSelect = (index: number) => {

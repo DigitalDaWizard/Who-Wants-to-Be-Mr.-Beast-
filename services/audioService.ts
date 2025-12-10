@@ -151,11 +151,12 @@ class AudioService {
         break;
 
       case 'tick':
-        mainOsc = this.createOsc('square', 800, now);
-        this.envelope(soundGain, 0.05, 0.01, 0.05, now);
+        // Subtle clock tick using sine wave
+        mainOsc = this.createOsc('sine', 800, now);
+        this.envelope(soundGain, 0.2, 0.005, 0.03, now); // Short and sharp
         mainOsc.connect(soundGain);
         mainOsc.start(now);
-        mainOsc.stop(now + 0.05);
+        mainOsc.stop(now + 0.1);
         break;
 
       case 'correct':
